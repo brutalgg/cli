@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
 // Print levels go in order: Debug, Info, Warn, Error, Fatal
@@ -13,9 +14,11 @@ const (
 	LevelWarn         // *
 	LevelError        // -
 	LevelFatal        // !
+	levelResults
 )
 
 var printLevel = LevelInfo
+var timestamp = false
 var outWriter io.Writer = os.Stdout
 var errWriter io.Writer = os.Stderr
 
@@ -32,6 +35,11 @@ func SetOutputWriter(w io.Writer) {
 // SetErrorWriter allows you to set the output writer for error and fatal messages
 func SetErrorWriter(w io.Writer) {
 	errWriter = w
+}
+
+// EnableTimeStamp enables timestamped output of line items
+func EnableTimeStamp() {
+	timestamp = true
 }
 
 // Debug prints a formatted debug level message with a newline appended
@@ -93,12 +101,17 @@ func WriteBanner(a string) {
 
 // WriteResults is meant to write results of tool actions
 func WriteResults(a ...interface{}) {
-	writeMessage(6, outWriter, fmt.Sprintln(a...))
+	writeMessage(levelResults, outWriter, fmt.Sprintln(a...))
 }
 
 func writeMessage(level int, writer io.Writer, message string) {
 	if level < printLevel {
 		return
+	}
+
+	if timestamp {
+		now := time.Now().Format("2006-01-02 15:04:05")
+		message = fmt.Sprintf("%s %s", now, message)
 	}
 	fmt.Fprint(writer, message)
 }
