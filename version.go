@@ -3,7 +3,7 @@ package cli
 import "fmt"
 
 // Version is current version of this library.
-var Version = v{1, 0, 0}
+var Version = v{1, 0, 1}
 
 // v holds the version of this library.
 type v struct {
